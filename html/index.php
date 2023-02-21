@@ -16,6 +16,17 @@ if (file_exists("/srv/data/sysname")) {
     $sysname = 'SCONOSCIUTO';
 }
 
+$relePorts = [
+    1 => "A1",
+    2 => "A2",
+    3 => "B1",
+    4 => "B2",
+    5 => "C1",
+    6 => "C2",
+    7 => "D1",
+    8 => "D2"
+];
+
 ?>
 
 <script src="/js_/nerdamer.core.js"></script>
@@ -90,8 +101,8 @@ if (file_exists("/srv/data/sysname")) {
         if (value && formula) {
 
             if (formula == 'x') {
-                
-                x = [value];
+
+                rawInput.value = Math.round(value);
 
             } else {
             
@@ -101,9 +112,9 @@ if (file_exists("/srv/data/sysname")) {
                 // console.log(equation + " => [" + x + " => " + Math.round(x[0].text('decimals')) + "]");
                 // console.log(x.length)
             
+                rawInput.value = Math.round(x[0].text('decimals'));
+            
             }
-
-            rawInput.value = Math.round(x[0].text('decimals'));
 
         } else {
             rawInput.value = '';
@@ -151,6 +162,24 @@ if (file_exists("/srv/data/sysname")) {
                 </div>
                 <span id="<?= $error ? 'error-login' : ''?>"><?= $error ? 'Username o Password errata' : '' ?></span>
                 <input name="submit" type="submit" value="Login" class="confirm-button cursor">
+            </form>
+        </div>
+        <div class="flex-vertical wifi-div" id="login">
+            <b>Credenziali WiFi</b>
+            <form action="/php_/subphp_/script.php" method="post" class="flex-vertical" id="login-form" autocomplete="off">
+                <input autocomplete="off" name="username" type="text" class="none">
+                <input autocomplete="off" name="password" type="password" class="none">
+                <div class="flex">
+                    <div class="flex">
+                        <label>SSID </label>
+                        <input id="sys-ssid" name="sys-ssid" placeholder="SSID" value="<?= shell_exec("/var/www/html/script_/MANAGE_wifi showSSIDnof") ?>" type="text" autocomplete="off">
+                    </div>
+                    <div class="flex">
+                        <label>Password </label>
+                        <input id="sys-psk" name="sys-psk" placeholder="<?= str_repeat("*", strlen(shell_exec("/var/www/html/script_/MANAGE_wifi showPSKnof"))) ?>" type="text" autocomplete="off">
+                    </div>
+                </div>
+                <input name="submit" type="submit" value="Salva" class="confirm-button cursor">
             </form>
         </div>
         <h1 class="rules-title">Regole</h1>
@@ -222,7 +251,7 @@ if (file_exists("/srv/data/sysname")) {
 
                             <div class="rele" id="<?= "rele" . $releId ?>">
                                 <div class="rele-title flex">
-                                    <h2>RELÈ <?= $releId; ?></h2>
+                                    <h2>RELÈ <?= $relePorts[$releId]; ?> </h2>
                                     <img src="/css_/x-png-33.png" class="delete-rule cursor" onclick="emptyRule(this)"/>
                                 </div>
                                 <div class="inline-rule-info">
@@ -254,7 +283,7 @@ if (file_exists("/srv/data/sysname")) {
                                     </div>
                                     <div class="rule-delay rule-info">
                                         <span>ACCENDI RELÈ PER</span>
-                                        <input name="<?= "rele[" . $ReleName . "][" . $releId . "][duration]" ?>" type="number" value="<?= $releDuration ?>" placeholder="0" min=0 class="duration-value">
+                                        <input name="<?= "rele[" . $ReleName . "][" . $releId . "][duration]" ?>" type="number" value="<?= $releDuration ?>" placeholder="1" min=1 class="duration-value">
                                         <span>MINUTI E DISATTIVALO PER</span>
                                         <input name="<?= "rele[" . $ReleName . "][" . $releId . "][delay]" ?>" type="number" value="<?= $releDelay ?>" placeholder="0" min=0 class="delay-value">
                                         <span>MINUTI</span>
@@ -274,6 +303,7 @@ if (file_exists("/srv/data/sysname")) {
                 <?php endforeach; ?>
                 <div class="add-osirele-div rele flex">
                     <span>Aggiungi OsiRELE</span>
+                    <input name="newReleName" type=text placeholder="R00001">
                     <button name="Aggiungi" class="cursor">
                         <img src="/css_/add.png" />
                     </button>
